@@ -1,0 +1,6 @@
+tmp
+bin
+*_templ.go
+static/css/output.css
+static/js/*
+static/img/*
