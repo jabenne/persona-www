@@ -21,7 +21,7 @@ jobs:
     - run:
         name: "Build Image"
         command: |
-          TAG=$GCP_ARTURL/$CIRCLE_BRANCH:$CIRCLE_BUILD_NUM
+          TAG=$GCP_ARTURL/$CIRCLE_BRANCH:$CIRCLE_SHA1
           docker build -t $TAG .
     - run:
         name: "Push Image"
@@ -39,8 +39,8 @@ jobs:
     - run:
         name: "Deploy New Revision"
         command: |
-          TAG=$GCP_ARTURL/$CIRCLE_BRANCH:$CIRCLE_BUILD_NUM
-          gcloud run deploy $CIRCLE_BRANCH $TAG
+          TAG=$GCP_ARTURL/$CIRCLE_BRANCH:$CIRCLE_SHA1
+          gcloud run deploy $CIRCLE_BRANCH --image=$TAG
 
 workflows:
   build-and-deploy:
