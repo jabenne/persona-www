@@ -17,7 +17,7 @@ jobs:
           google_project_id: GCP_PROJID
       - run: 
           name: "Authenticate Docker For GCP"
-          command: gcloud auth configure-docker
+          command: gcloud auth configure-docker australia-southeast1
       - run:
           name: "Build Image"
           command: |
