@@ -1,0 +1,51 @@
+version: 2.1
+
+orbs:
+  gcp-cli: circleci/gcp-cli@3.2.2
+
+jobs:
+  build:
+    docker:
+    - image: cimg/base:2024.11
+    steps:
+    - checkout
+    - setup_remote_docker:
+        docker_layer_caching: true
+    - gcp-cli/setup:
+        gcloud_service_key: GCP_KEY
+        google_compute_region: GCP_REGION
+        google_project_id: GCP_PROJID
+    - run: 
+        name: "Authenticate Docker For GCP"
+        command: gcloud auth configure-docker australia-southeast1-docker.pkg.dev
+    - run:
+        name: "Build Image"
+        command: |
+          TAG=$GCP_ARTURL/$CIRCLE_BRANCH:$CIRCLE_SHA1
+          docker build -t $TAG .
+    - run:
+        name: "Push Image"
+        command: |
+          TAG=$GCP_ARTURL/$CIRCLE_BRANCH:$CIRCLE_SHA1
+          docker push $TAG
+  deploy:
+    docker:
+    - image: cimg/base:2024.11
+    steps:
+    - gcp-cli/setup:
+        gcloud_service_key: GCP_KEY
+        google_compute_region: GCP_REGION
+        google_project_id: GCP_PROJID
+    - run:
+        name: "Deploy New Revision"
+        command: |
+          TAG=$GCP_ARTURL/$CIRCLE_BRANCH:$CIRCLE_SHA1
+          gcloud run deploy $CIRCLE_BRANCH --image=$TAG --region=$GCP_REGION
+
+workflows:
+  build-and-deploy:
+    jobs:
+      - build
+      - deploy:
+          requires:
+            - build
