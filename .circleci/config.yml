@@ -26,7 +26,7 @@ jobs:
     - run:
         name: "Push Image"
         command: |
-          TAG=$GCP_ARTURL/$CIRCLE_BRANCH:$CIRCLE_BUILD_NUM
+          TAG=$GCP_ARTURL/$CIRCLE_BRANCH:$CIRCLE_SHA1
           docker push $TAG
   deploy:
     docker:
