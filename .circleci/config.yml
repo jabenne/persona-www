@@ -9,6 +9,8 @@ jobs:
       - image: cimg/base:2024.11
       steps:
       - checkout
+      - setup_remote_docker:
+          docker_layer_caching: true
       - gcp-cli/setup:
           gcloud_service_key: GCP_KEY
           google_compute_region: GCP_REGION
