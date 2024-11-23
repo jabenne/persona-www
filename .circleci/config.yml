@@ -40,7 +40,7 @@ jobs:
         name: "Deploy New Revision"
         command: |
           TAG=$GCP_ARTURL/$CIRCLE_BRANCH:$CIRCLE_SHA1
-          gcloud run deploy $CIRCLE_BRANCH --image=$TAG
+          gcloud run deploy $CIRCLE_BRANCH --image=$TAG --region=$GCP_REGION
 
 workflows:
   build-and-deploy:
