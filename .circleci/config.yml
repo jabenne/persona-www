@@ -1,0 +1,41 @@
+version: 2.1
+
+orbs:
+  gcp-cli: circleci/gcp-cli@3.2.2
+
+jobs:
+  build:
+      docker:
+      - image: cimg/base:2024.11
+      steps:
+      - checkout
+      - gcp-cli/setup:
+          gcloud_service_key: GCP_KEY
+          google_compute_region: GCP_REGION
+          google_project_id: GCP_PROJID
+      - run: 
+          name: "Authenticate Docker For GCP"
+          command: gcloud auth configure-docker
+      - run:
+          name: "Build Image"
+          command: |
+            TAG=$GCP_ARTURL/$CIRCLE_BRANCH:$CIRCLE_BUILD_NUM
+            docker build -t $TAG .
+      - run:
+          name: "Push Image"
+          command: |
+            TAG=$GCP_ARTURL/$CIRCLE_BRANCH:$CIRCLE_BUILD_NUM
+            docker push $TAG
+  deploy:
+      docker:
+      - image: cimg/base:2024.11
+      steps:
+        - gcp-cli/setup:
+            gcloud_service_key: GCP_KEY
+            google_compute_region: GCP_REGION
+            google_project_id: GCP_PROJID
+        - run:
+            name: "Deploy New Revision"
+            command: |
+              TAG=$GCP_ARTURL/$CIRCLE_BRANCH:$CIRCLE_BUILD_NUM
+              gcloud run deploy $CIRCLE_BRANCH $TAG
