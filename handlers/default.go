@@ -34,7 +34,7 @@ func (h *DefaultHandler) Get(c echo.Context) error {
     if err != nil {
         return err
     }
-    return render(c, views.Index("Test", gh))
+    return render(c, views.Index("jabenne.net", gh))
 }
 
 func render(ctx echo.Context, cmp templ.Component) error {
