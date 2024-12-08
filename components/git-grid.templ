@@ -2,28 +2,16 @@ package components
 
 templ GitGrid(history []int) {
     <div class="grid grid-rows-7 grid-flow-col gap-px auto-cols-min content-center justify-center">
-        for i, h := range history {
-            if i > 181 {
-                if h == 0 {
-                    <div class="bg-gray-200 h-2.5 w-2.5 rounded-sm hidden md:block"/>
-                } else if h == 1 {
-                    <div class="bg-violet-200 h-2.5 w-2.5 rounded-sm hidden md:block"/>
-                } else if h == 2 {
-                    <div class="bg-violet-300 h-2.5 w-2.5 rounded-sm hidden md:block"/>
-                } else if h > 3 {
-                    <div class="bg-violet-400 h-2.5 w-2.5 rounded-sm hidden md:block"/>
-                }
-            } else {
-                if h == 0 {
-                    <div class="bg-gray-200 h-2.5 w-2.5 rounded-sm"/>
-                } else if h == 1 {
-                    <div class="bg-violet-200 h-2.5 w-2.5 rounded-sm"/>
-                } else if h == 2 {
-                    <div class="bg-violet-300 h-2.5 w-2.5 rounded-sm"/>
-                } else if h > 3 {
-                    <div class="bg-violet-400 h-2.5 w-2.5 rounded-sm"/>
-                }
-            }
+        for i, h := range history { 
+            <div class={ 
+                "h-2.5 w-2.5 rounded-sm",
+                templ.KV("hidden md:block", i > 181), 
+                templ.KV("bg-gray-200", h == 0), 
+                templ.KV("bg-violet-200", h == 1), 
+                templ.KV("bg-violet-300", h == 2), 
+                templ.KV("bg-violet-400", h >= 3)}
+            />
         }
     </div>
 }
+
