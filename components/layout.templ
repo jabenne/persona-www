@@ -4,6 +4,7 @@ templ Layout(title string) {
     <html>
         <head>
             <title>{ title }</title>
+            <link rel="icon" type="image/x-icon" href="/static/img/favicon.ico">
             <link rel="preconnect" href="https://fonts.googleapis.com">
             <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
             <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
@@ -13,8 +14,9 @@ templ Layout(title string) {
             <link rel="stylesheet" type='text/css' href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/regular.min.css" />
             <script src="/static/js/htmx.min.js" />
         </head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <body class={ global() }>
-            <div class={ container() }>
+            <div class="w-full md:w-[600px] pt-[10vh] md:pt-[30vh] px-8 md:m-auto">
                 { children... }
             </div>
         </body>
@@ -22,14 +24,6 @@ templ Layout(title string) {
 }
 
 css global() {
+    font-family: "Inter", sans-serif;
     background-color: #f7f7f7;
 }
-
-css container() {
-    font-family: "Inter", sans-serif;
-    width: 600px;
-    padding-top: 40vh;
-    margin-left: auto;
-    margin-right: auto;
-}
-

@@ -9,8 +9,10 @@ templ Index(title string, history []int) {
         @CliCopy("ssh", "guest@ssh.jabenne.net")
         <p class="mb-4 text-gray-500">
             <span>I'm always eager to take on new opportunity and expand my skillset;</span> 
-            <a class="text-gray-800 cursor-pointer hover:text-purple-400">download my CV</a>
-            <span>, check out my Github and drop me a line if you think I'd be a good fit for your team, or if you'd like to work on something together!</span>
+            <a class="text-gray-800 cursor-pointer hover:text-purple-400" href="/static/doc/cv.md" download target="_blank">download my CV</a>
+            <span>, check out my Github and </span>
+            <a class="text-gray-800 cursor-pointer hover:text-purple-400" href="mailto: self@jabenne.net">drop me a line</a>
+            <span>{`if you think I'd be a good fit for your team, or if you'd like to work on something together!`}</span>
         </p>
         <hr class="h-px my-6 bg-gray-200 border-0 dark:bg-gray-700"/>
         @GitGrid(history)
@@ -20,8 +22,8 @@ templ Index(title string, history []int) {
 }
 
 templ ProfileCard() {
-    <div class="flex items-center gap-2.5 mb-4">
-        <img src="/static/img/portrait.png" class="h-14 w-14 rounded-full"/>
+    <div class="flex flex-col gap-2.5 mb-4">
+        <img src="/static/img/portrait2.png" class="h-40 w-40"/>
         <div class="flex flex-col">
             <span class="text-lg">Jack Bennett</span>
             <span class="text-sm text-gray-400">"Full-Stack Engineer"</span>
@@ -35,7 +37,6 @@ templ NavPanel() {
         <a class="ml-auto" target="_blank" href="https://github.com/jabenne">
             <i class="devicon-github-original text-gray-800 hover:text-purple-400 cursor-pointer"></i>
         </a>
-        <i class="devicon-swagger-plain text-gray-800 hover:text-purple-400 cursor-pointer"></i>
         <a href="https://www.linkedin.com/in/jack-bennett-78874b205/" target="_blank">
             <i class="devicon-linkedin-plain text-gray-800 hover:text-purple-400 cursor-pointer"></i>
         </a>

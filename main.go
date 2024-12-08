@@ -1,6 +1,9 @@
 package main
 
 import (
+	"fmt"
+	"os"
+
 	"git.jbennett.dev/persona-www/handlers"
 	"github.com/labstack/echo/v4"
 )
@@ -12,12 +15,16 @@ func main() {
     if err != nil {
         panic(err)
     }
+    
+    port, exists := os.LookupEnv("PORT")
+    if !exists {
+        port = "80"
+    }
 
     e.Static("/static", "static")
 
     e.GET("/", defaultH.Get)
 
-    e.Start("127.0.0.1:3000")
-
+    e.Start(fmt.Sprintf(":%s", port))
 }
 
