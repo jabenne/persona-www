@@ -8,6 +8,16 @@ jobs:
     docker:
     - image: cimg/base:2024.11
     steps:
+    - run:
+        name: Set Branch Environment Variable 
+        command: |
+          if test "$CIRCLE_BRANCH" == "main"
+          then
+            echo 'export BUILD="production"' >> "$BASH_ENV"
+          else
+            echo 'export BUILD="$GCP_BRANCH"' >> "$BASH_ENV"
+          fi
+          source "$BASH_ENV"
     - checkout
     - setup_remote_docker:
         docker_layer_caching: true
@@ -21,17 +31,27 @@ jobs:
     - run:
         name: "Build Image"
         command: |
-          TAG=$GCP_ARTURL/$CIRCLE_BRANCH:$CIRCLE_SHA1
+          TAG=$GCP_ARTURL/$BUILD:$CIRCLE_SHA1
           docker build -t $TAG .
     - run:
         name: "Push Image"
         command: |
-          TAG=$GCP_ARTURL/$CIRCLE_BRANCH:$CIRCLE_SHA1
+          TAG=$GCP_ARTURL/$BUILD:$CIRCLE_SHA1
           docker push $TAG
   deploy:
     docker:
     - image: cimg/base:2024.11
     steps:
+    - run:
+        name: Set Branch Environment Variable 
+        command: |
+          if test "$CIRCLE_BRANCH" == "main"
+          then
+            echo 'export BUILD="production"' >> "$BASH_ENV"
+          else
+            echo 'export BUILD="$GCP_BRANCH"' >> "$BASH_ENV"
+          fi
+          source "$BASH_ENV"
     - gcp-cli/setup:
         gcloud_service_key: GCP_KEY
         google_compute_region: GCP_REGION
@@ -39,9 +59,9 @@ jobs:
     - run:
         name: "Deploy New Revision"
         command: |
-          TAG=$GCP_ARTURL/$CIRCLE_BRANCH:$CIRCLE_SHA1
-          BUCKET=$CIRCLE_BRANCH-persona-net-static
-          gcloud run deploy $CIRCLE_BRANCH \
+          TAG=$GCP_ARTURL/$BUILD:$CIRCLE_SHA1
+          BUCKET=$BUILD-persona-net-static
+          gcloud run deploy $BUILD \
             --image=$TAG \
             --region=$GCP_REGION \
             --add-volume=name=static,type=cloud-storage,bucket=$BUCKET \
