@@ -15,7 +15,7 @@ jobs:
           then
             echo 'export BUILD="production"' >> "$BASH_ENV"
           else
-            echo 'export BUILD="$GCP_BRANCH"' >> "$BASH_ENV"
+            echo 'export BUILD="$CIRCLE_BRANCH"' >> "$BASH_ENV"
           fi
           source "$BASH_ENV"
     - checkout
@@ -49,7 +49,7 @@ jobs:
           then
             echo 'export BUILD="production"' >> "$BASH_ENV"
           else
-            echo 'export BUILD="$GCP_BRANCH"' >> "$BASH_ENV"
+            echo 'export BUILD="$CIRCLE_BRANCH"' >> "$BASH_ENV"
           fi
           source "$BASH_ENV"
     - gcp-cli/setup:
