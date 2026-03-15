@@ -10,11 +10,9 @@ templ Layout(title string) {
             <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
             <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
             <link rel="stylesheet" href="/static/css/output.css"></link>
-            <link rel="stylesheet" type='text/css' href="https://cdn.jsdelivr.net/gh/devicons/devicon@latest/devicon.min.css" />
-            <link rel="stylesheet" type='text/css' href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/regular.min.css" />
-            <script src="/static/js/htmx.min.js" />
+            <script src="/static/js/htmx.min.js"></script>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
         </head>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <body class={ global() }>
             <div class="w-full md:w-[600px] pt-[10vh] md:pt-[30vh] px-8 md:m-auto">
                 { children... }

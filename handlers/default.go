@@ -1,50 +1,62 @@
 package handlers
 
 import (
-	"math/rand/v2"
-	"time"
+	"context"
 
 	views "git.jbennett.dev/persona-www/components"
-	"git.jbennett.dev/persona-www/services"
+	"git.jbennett.dev/persona-www/services/lanyard"
 	"github.com/a-h/templ"
 	"github.com/labstack/echo/v4"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 )
 
-type GitService interface {
-    GetHistorySince(string, time.Time) ([]int, error) 
+type LanyardService interface {
+	GetDefault(context.Context) (*lanyard.Presence, error)
+}
+
+type Option func(*DefaultHandler)
+
+func WithLogger(logger zerolog.Logger) Option {
+	return func(h *DefaultHandler) {
+		h.logger = logger
+	}
 }
 
 type DefaultHandler struct {
-    name string
-    git GitService 
+	logger  zerolog.Logger
+	lanyard LanyardService
 }
 
-func New() (*DefaultHandler, error) {
-    ghC, err := services.NewGithubConfigFromEnv()
-    if err != nil {
-        panic(err)
-    }
-    return &DefaultHandler{
-        git: services.NewGithubService(ghC),
-    }, nil
+func New(lanyard LanyardService, opts ...Option) (*DefaultHandler, error) {
+	h := &DefaultHandler{
+		logger:  log.Logger,
+		lanyard: lanyard,
+	}
+	for _, opt := range opts {
+		opt(h)
+	}
+	return h, nil
 }
 
 func (h *DefaultHandler) Get(c echo.Context) error {
-    gh, err := h.git.GetHistorySince("jabenne", time.Now().AddDate(0, 0, -364))
-    if err != nil {
-        return err
-    }
-    return render(c, views.Index("jabenne.net", gh))
+	return render(c, views.Index("jabenne.net"))
+}
+
+func (h *DefaultHandler) GetPresence(c echo.Context) error {
+	p, err := h.lanyard.GetDefault(c.Request().Context())
+	if err != nil {
+		h.logger.Error().Err(err).Msg("failed to fetch lanyard presence")
+		return render(c, views.Presence("offline", nil))
+	}
+	var activity *lanyard.Activity
+	if len(p.Activities) > 0 {
+		activity = &p.Activities[0]
+	}
+
+	return render(c, views.Presence(p.DiscordStatus, activity))
 }
 
 func render(ctx echo.Context, cmp templ.Component) error {
-    return cmp.Render(ctx.Request().Context(), ctx.Response())
-}
-
-func fudgeGitHistory() []int {
-    gitHistory := make([]int, 364)
-    for i := range gitHistory {
-        gitHistory[i] = rand.IntN(3)
-    }
-    return gitHistory
+	return cmp.Render(ctx.Request().Context(), ctx.Response())
 }

@@ -1,0 +1,48 @@
+package components
+
+import (
+	"git.jbennett.dev/persona-www/services/lanyard"
+)
+
+templ Presence(status string, activity *lanyard.Activity) {
+    <div class="flex flex-col mb-4 font-mono">
+        <div class="flex flex-row gap-2 items-center">
+            @StatusIndicator(status)
+            if activity != nil {
+                <span class="text-sm text-gray-600">|</span>
+                <span class="text-sm text-violet-400">{ activity.Name }</span>
+            }
+        </div>
+        if activity != nil {
+        <div class="flex flex-row gap-2">
+            <span class="text-xs text-gray-400">{ activity.Details }</span>
+            if activity.State != "" {
+                <span class="text-xs text-gray-300">{ "// " + activity.State }</span>
+            }
+        </div>
+        } else {
+        <div class="flex flex-row gap-2 items-center">
+        </div>
+        }
+    </div>
+}
+
+templ StatusIndicator(status string) {
+    <div class={
+        "w-2",
+        "h-2", 
+        "rounded-full",
+        templ.KV("bg-green-400", status == "online"),
+        templ.KV("bg-yellow-400", status == "idle"),
+        templ.KV("border-gray-300 border-2", status == "offline"),
+        }
+    ></div>
+    switch status {
+    case "online": 
+        <span class="text-sm text-gray-600">Online</span>
+    case "idle": 
+        <span class="text-sm text-gray-600">Idle</span>
+    default:
+        <span class="text-sm text-gray-400">Offline</span>
+    }
+}
