@@ -4,7 +4,12 @@ module.exports = {
         "./components/*.{go,js,templ,html}"
     ],
     theme: {
-      extend: {},
+      extend: {
+        animation: {
+            // Reduced from default 2s to 0.75s
+            'pulse-fast': 'pulse 0.75s cubic-bezier(0.6, 1, 0.6, 1) infinite',
+            },
+        },
     },
     plugins: [],
   }

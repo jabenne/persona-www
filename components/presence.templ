@@ -1,0 +1,166 @@
+package components
+
+templ Presence(discordID string) {
+    <div id="lanyard-presence" class="flex flex-col font-mono" data-discord-id={ discordID }>
+        <a href={ "https://discord.com/users/" + discordID } target="_blank" rel="noopener noreferrer">
+            <div class="flex flex-row gap-2 items-center h-4">
+                @StatusIndicator()
+                <span id="lanyard-separator" class="text-sm text-gray-600 hidden">|</span>
+                <span id="lanyard-activity-name" class="text-sm text-violet-400"></span>
+            </div>
+        </a>
+        <div id="lanyard-activity-container" class="flex flex-row gap-2 hidden">
+            <span id="lanyard-activity-details" class="text-xs text-gray-400"></span>
+            <span id="lanyard-activity-state" class="text-xs text-gray-300"></span>
+        </div>
+    </div>
+
+    <script>
+        (() => {
+            var socket;
+            var heartbeatTimer;
+            var reconnectDelay = 1000;
+            var maxReconnectDelay = 30000;
+
+            /**
+             * Establishes webhook connection and message handling.
+             */
+            function connect() {
+                socket = new WebSocket('wss://api.lanyard.rest/socket');
+
+                socket.onopen = function () {
+                    reconnectDelay = 1000;
+                };
+
+                socket.onmessage = function (event) {
+                    var msg;
+                    try {
+                        msg = JSON.parse(event.data);
+                    } catch (e) {
+                        return;
+                    }
+
+                    if (msg.op === 1) {
+                        var interval = msg.d && msg.d.heartbeat_interval ? msg.d.heartbeat_interval : 30000;
+                        clearInterval(heartbeatTimer);
+                        heartbeatTimer = setInterval(function () {
+                            if (socket.readyState === WebSocket.OPEN) {
+                                socket.send(JSON.stringify({ op: 3 }));
+                            }
+                        }, interval);
+
+                        var discordId = document.getElementById('lanyard-presence').getAttribute('data-discord-id');
+                        socket.send(JSON.stringify({
+                            op: 2,
+                            d: { subscribe_to_id: discordId }
+                        }));
+                    }
+
+                    // op 0: Event — INIT_STATE or PRESENCE_UPDATE.
+                    if (msg.op === 0 && msg.d) {
+                        updateDOM(msg.d);
+                    }
+                };
+
+                socket.onclose = function () {
+                    clearInterval(heartbeatTimer);
+                    setTimeout(function () {
+                        reconnectDelay = Math.min(reconnectDelay * 2, maxReconnectDelay);
+                        connect();
+                    }, reconnectDelay);
+                };
+
+                socket.onerror = function () {
+                    socket.close();
+                };
+            }
+
+            /**
+             * Selects the most relevant activity from the activities array.
+             * Custom Status entries (type 4) are skipped in favour of rich presence.
+             *
+             * @param {Array} activities
+             * @returns {Object|null}
+             */
+            function pickActivity(activities) {
+                if (!activities || activities.length === 0) return null;
+                for (var i = 0; i < activities.length; i++) {
+                    if (activities[i].type !== 4) return activities[i];
+                }
+                return null;
+            }
+
+            /**
+             * Updates the DOM elements managed by the Presence component.
+             *
+             * @param {Object} data - The presence data payload from Lanyard.
+             */
+            function updateDOM(data) {
+                var dot      = document.getElementById('lanyard-status-dot');
+                var text     = document.getElementById('lanyard-status-text');
+                var sep      = document.getElementById('lanyard-separator');
+                var actName  = document.getElementById('lanyard-activity-name');
+                var actBox   = document.getElementById('lanyard-activity-container');
+                var actDet   = document.getElementById('lanyard-activity-details');
+                var actState = document.getElementById('lanyard-activity-state');
+
+                if (!dot || !text) return;
+
+                // --- Status dot and label ---
+                var status = data.discord_status || 'offline';
+
+                dot.className = 'w-2 h-2 transition-colors duration-300';
+                switch (status) {
+                    case 'online':
+                        dot.classList.add('fill-green-400');
+                        text.textContent = 'Online';
+                        text.className = 'text-sm text-gray-600';
+                        break;
+                    case 'idle':
+                        dot.classList.add('fill-yellow-400');
+                        text.textContent = 'Idle';
+                        text.className = 'text-sm text-gray-600';
+                        break;
+                    case 'dnd':
+                        dot.classList.add('fill-red-500');
+                        text.textContent = 'Do Not Disturb';
+                        text.className = 'text-sm text-gray-600';
+                        break;
+                    default:
+                        dot.classList.add('fill-gray-400');
+                        text.textContent = 'Offline';
+                        text.className = 'text-sm text-gray-400';
+                }
+
+                // --- Activity ---
+                var activity = pickActivity(data.activities);
+
+                if (activity) {
+                    if (sep) sep.classList.remove('hidden');
+                    if (actName) actName.textContent = activity.name || '';
+
+                    if (actBox) actBox.classList.remove('hidden');
+                    if (actDet) actDet.textContent = activity.details || '';
+                    if (actState) {
+                        actState.textContent = activity.state ? '// ' + activity.state : '';
+                    }
+                } else {
+                    if (sep) sep.classList.add('hidden');
+                    if (actName) actName.textContent = '';
+                    if (actBox) actBox.classList.add('hidden');
+                    if (actDet) actDet.textContent = '';
+                    if (actState) actState.textContent = '';
+                }
+            }
+
+            connect();
+
+        })();
+    </script>
+}
+
+templ StatusIndicator() {
+    <div id="lanyard-status-dot" class="h-2 w-2 fill-gray-300 animate-pulse-fast">@CircleIcon("")</div>
+    <span id="lanyard-status-text" class="text-sm text-gray-300">Connecting</span>
+}
+

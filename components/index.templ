@@ -1,58 +1,44 @@
 package components 
 
-templ Index(title string, history []int) {
+templ Index(title string, discordID string) {
     @Layout(title) {
-        @ProfileCard()
+        @ProfileCard(discordID)
+        <p class="text-gray-500 mb-4">Hey, I'm Jack!</p> 
         <p class="mb-4 text-gray-500">
-            <span class="">Hey, I'm Jack!</span> A journeyman programmer with a love of the low-tech, high-bar fever-dream of early-modern computing. I love my CLI's, I love the DIY of my home-lab, I love the creative re-use of pre-existing and age-old paradigms. I love to know how a system works, from top to bottom. I probably consume too many <a class="hover:text-purple-400 text-gray-300" target="_blank" href="https://www.youtube.com/watch?v=CgdKYBqe6QA">Jonathan Blow</a> takes, and in an effort not to identify as a button engineer, my home page is intentionally sparse, so, take a tour of my work via SSH!
+            I'm a self-taught programmer with a love for the low-tech. I love a POSIX compliant CLI, the DIY of my home-lab, technological minimalism and the creative re-use of age-old paradigms. I need to know how a system works, from top to bottom. I think performance still matters. I think your landing page should deliver in less than <a class="underline hover:text-purple-400 text-gray-800" rel="noopener noreferrer" target="_blank" href="https://endtimes.dev/why-your-website-should-be-under-14kb-in-size/">14kb</a>. I probably consume too many <a class="underline hover:text-purple-400 text-gray-800" rel="noopener noreferrer" target="_blank" href="https://www.youtube.com/watch?v=CgdKYBqe6QA">Jonathan Blow</a> takes.
         </p>
-        @CliCopy("ssh", "guest@ssh.jabenne.net")
         <p class="mb-4 text-gray-500">
             <span>I'm always eager to take on new opportunity and expand my skillset;</span> 
-            <a class="text-gray-800 cursor-pointer hover:text-purple-400" href="/static/doc/cv.md" download target="_blank">download my CV</a>
+            <a class="underline text-gray-800 cursor-pointer hover:text-purple-400" href="/static/doc/cv.md" download rel="noopener noreferrer" target="_blank">download my CV</a>
             <span>, check out my Github and </span>
-            <a class="text-gray-800 cursor-pointer hover:text-purple-400" href="mailto: self@jabenne.net">drop me a line</a>
+            <a class="underline text-gray-800 cursor-pointer hover:text-purple-400" href="mailto:self@jabenne.net">drop me a line</a>
             <span>{`if you think I'd be a good fit for your team, or if you'd like to work on something together!`}</span>
         </p>
         <hr class="h-px my-6 bg-gray-200 border-0 dark:bg-gray-700"/>
-        @GitGrid(history)
-        <hr class="h-px mt-6 mb-1 bg-gray-200 border-0 dark:bg-gray-700"/>
         @NavPanel()
     }
 }
 
-templ ProfileCard() {
+templ ProfileCard(discordID string) {
     <div class="flex flex-col gap-2.5 mb-4">
-        <img src="/static/img/portrait2.png" class="h-40 w-40"/>
+        <img src="/static/img/portrait.png" class="h-48 w-48"/>
         <div class="flex flex-col">
             <span class="text-lg">Jack Bennett</span>
-            <span class="text-sm text-gray-400">"Full-Stack Engineer"</span>
+            <div class="h-10">
+                @Presence(discordID)
+            </div>
         </div>
     </div>
 }
 
 templ NavPanel() {
     <div class="flex gap-2.5 items-center mt-2 pb-10">
-        <a href="mailto: self@jabenne.net" class="text-gray-400 hover:underline hover:text-gray-500 text-sm cursor-pointer font-mono">self@jabenne.net</a>
-        <a class="ml-auto" target="_blank" href="https://github.com/jabenne">
-            <i class="devicon-github-original text-gray-800 hover:text-purple-400 cursor-pointer"></i>
+        <a href="mailto:self@jabenne.net" class="text-gray-400 hover:underline hover:text-gray-500 text-sm cursor-pointer font-mono">self@jabenne.net</a>
+        <a class="ml-auto" rel="noopener noreferrer" target="_blank" href="https://github.com/jabenne">
+            @GithubIcon("w-5 h-5 text-gray-800 hover:text-purple-400 cursor-pointer")
         </a>
-        <a href="https://www.linkedin.com/in/jack-bennett-78874b205/" target="_blank">
-            <i class="devicon-linkedin-plain text-gray-800 hover:text-purple-400 cursor-pointer"></i>
+        <a href="https://www.linkedin.com/in/jack-bennett-78874b205/" rel="noopener noreferrer" target="_blank">
+            @LinkedinIcon("w-5 h-5 text-gray-800 hover:text-purple-400 cursor-pointer")
         </a>
-    </div>
-}
-
-script Copy(event templ.JSExpression, command string, args string) {
-   !window.s?s=command+' '+args:null;navigator.clipboard.writeText(s);
-   event.target.textContent='COPIED!';
-}
-
-templ CliCopy(command string, args string) {
-    <div class="flex flex-row text-sm gap-2 rounded-md mb-3 py-2 font-mono">
-        <span class="text-fuchsia-400">$</span>
-        <span class="text-violet-400">{ command }</span>
-        <span class="text-gray-600">{ args }</span>
-      <div class="text-gray-400 hover:text-gray-500 ml-auto cursor-pointer" hx-on:click={ Copy(templ.JSExpression("event"), command, args)}>COPY</div>
     </div>
 }

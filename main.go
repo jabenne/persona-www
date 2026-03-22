@@ -3,28 +3,41 @@ package main
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"git.jbennett.dev/persona-www/handlers"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 func main() {
-    e := echo.New()
+	e := echo.New()
+	e.Use(middleware.GzipWithConfig(middleware.GzipConfig{
+		Level: 5,
+		Skipper: func(c echo.Context) bool {
+			return strings.Contains(c.Path(), "/static/img")
+		},
+	}))
 
-    defaultH, err := handlers.New()
-    if err != nil {
-        panic(err)
-    }
-    
-    port, exists := os.LookupEnv("PORT")
-    if !exists {
-        port = "80"
-    }
+	lanyardID := os.Getenv("LANYARD_ID")
 
-    e.Static("/static", "static")
+	defaultH, err := handlers.New(lanyardID)
+	if err != nil {
+		panic(err)
+	}
 
-    e.GET("/", defaultH.Get)
+	port, exists := os.LookupEnv("PORT")
+	if !exists {
+		port = "3030"
+	}
 
-    e.Start(fmt.Sprintf(":%s", port))
+	e.Static("/static", "static")
+
+	e.GET("/", defaultH.Get)
+	e.GET("/presence", defaultH.GetPresence)
+
+	err = e.Start(fmt.Sprintf(":%s", port))
+	if err != nil {
+		panic(err)
+	}
 }
-
