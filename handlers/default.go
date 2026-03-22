@@ -1,50 +1,45 @@
 package handlers
 
 import (
-	"math/rand/v2"
-	"time"
-
 	views "git.jbennett.dev/persona-www/components"
-	"git.jbennett.dev/persona-www/services"
 	"github.com/a-h/templ"
 	"github.com/labstack/echo/v4"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 )
 
-type GitService interface {
-    GetHistorySince(string, time.Time) ([]int, error) 
+type Option func(*DefaultHandler)
+
+func WithLogger(logger zerolog.Logger) Option {
+	return func(h *DefaultHandler) {
+		h.logger = logger
+	}
 }
 
 type DefaultHandler struct {
-    name string
-    git GitService 
+	logger    zerolog.Logger
+	lanyardID string
 }
 
-func New() (*DefaultHandler, error) {
-    ghC, err := services.NewGithubConfigFromEnv()
-    if err != nil {
-        panic(err)
-    }
-    return &DefaultHandler{
-        git: services.NewGithubService(ghC),
-    }, nil
+func New(lanyardID string, opts ...Option) (*DefaultHandler, error) {
+	h := &DefaultHandler{
+		logger:    log.Logger,
+		lanyardID: lanyardID,
+	}
+	for _, opt := range opts {
+		opt(h)
+	}
+	return h, nil
 }
 
 func (h *DefaultHandler) Get(c echo.Context) error {
-    gh, err := h.git.GetHistorySince("jabenne", time.Now().AddDate(0, 0, -364))
-    if err != nil {
-        return err
-    }
-    return render(c, views.Index("jabenne.net", gh))
+	return render(c, views.Index("jabenne.net", h.lanyardID))
+}
+
+func (h *DefaultHandler) GetPresence(c echo.Context) error {
+	return render(c, views.Presence(h.lanyardID))
 }
 
 func render(ctx echo.Context, cmp templ.Component) error {
-    return cmp.Render(ctx.Request().Context(), ctx.Response())
-}
-
-func fudgeGitHistory() []int {
-    gitHistory := make([]int, 364)
-    for i := range gitHistory {
-        gitHistory[i] = rand.IntN(3)
-    }
-    return gitHistory
+	return cmp.Render(ctx.Request().Context(), ctx.Response())
 }
