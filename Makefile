@@ -7,7 +7,7 @@ dev:
 
 build:
 	@templ generate
-	tailwindcss -i ./static/css/input.css -o ./static/css/output.css
+	npx @tailwindcss/cli -i ./static/css/input.css -o ./static/css/output.css
 	go build -o bin/www main.go
 
 .DEFAULT_GOAL := dev
