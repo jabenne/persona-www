@@ -5,7 +5,7 @@ go 1.25.7
 require (
 	github.com/a-h/templ v0.3.1001
 	github.com/imroc/req/v3 v3.57.0
-	github.com/labstack/echo/v4 v4.12.0
+	github.com/labstack/echo/v4 v4.15.1
 )
 
 require (
@@ -19,7 +19,7 @@ require (
 	github.com/icholy/digest v1.1.0 // indirect
 	github.com/klauspost/compress v1.18.2 // indirect
 	github.com/labstack/gommon v0.4.2 // indirect
-	github.com/mattn/go-colorable v0.1.13 // indirect
+	github.com/mattn/go-colorable v0.1.14 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/natefinch/atomic v1.0.1 // indirect
 	github.com/quic-go/qpack v0.6.0 // indirect
@@ -34,6 +34,7 @@ require (
 	golang.org/x/sync v0.19.0 // indirect
 	golang.org/x/sys v0.39.0 // indirect
 	golang.org/x/text v0.32.0 // indirect
+	golang.org/x/time v0.14.0 // indirect
 	golang.org/x/tools v0.39.0 // indirect
 )
 

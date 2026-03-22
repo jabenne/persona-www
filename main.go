@@ -3,13 +3,21 @@ package main
 import (
 	"fmt"
 	"os"
+	"strings"
 
 	"git.jbennett.dev/persona-www/handlers"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 )
 
 func main() {
 	e := echo.New()
+	e.Use(middleware.GzipWithConfig(middleware.GzipConfig{
+		Level: 5,
+		Skipper: func(c echo.Context) bool {
+			return strings.Contains(c.Path(), "/static/img")
+		},
+	}))
 
 	lanyardID := os.Getenv("LANYARD_ID")
 
